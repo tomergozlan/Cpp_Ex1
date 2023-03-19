@@ -57,7 +57,7 @@ PElement GetAdptArrayAt(PAdptArray pArr, int idx){
     }
     PElement pElem = pArr->pElemArr[idx];
     if (!pElem) {
-        printf(Error! no element stored at that particular index)
+        printf("Error! no element stored at that particular index")
         return NULL;
     }
     return pArr->copyFunc(pElem);

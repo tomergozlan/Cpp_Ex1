@@ -13,9 +13,10 @@ typedef struct AdptArray_ {
 
 PAdptArray CreateAdptArray(COPY_FUNC copyFunc_, DEL_FUNC delFunc_, PRINT_FUNC printFunc_) {
     PAdptArray pArr = (PAdptArray)malloc(sizeof(AdptArray));
-    if (!pArr)
+    if (!pArr) {
         printf("Error ! Memory allocations failed");
         return NULL;
+    }
     pArr->ArrSize = 0;
     pArr->pElemArr = NULL;
     pArr->delFunc = delFunc_;
@@ -29,6 +30,8 @@ void DeleteAdptArray(PAdptArray pArr) {
     if (!pArr) return;
     for(i = 0; i < pArr->ArrSize; ++i)
     {
+        if ((pArr->pElemArr)[i] == NULL)
+            continue;
         pArr->delFunc((pArr->pElemArr)[i]);
     }
     free(pArr->pElemArr);
@@ -37,7 +40,8 @@ void DeleteAdptArray(PAdptArray pArr) {
 
 Result SetAdptArrayAt(PAdptArray pArr, int idx, PElement pNewElem) {
     PElement* newpElemArr;
-    if (!pArr) return FAIL;
+    if (!pArr)
+        return FAIL;
     if (idx >= pArr->ArrSize) {
         if ((newpElemArr = (PElement*)calloc((idx + 1), sizeof(PElement))) == NULL)
             return FAIL;
@@ -45,7 +49,8 @@ Result SetAdptArrayAt(PAdptArray pArr, int idx, PElement pNewElem) {
         free(pArr->pElemArr);
         pArr->pElemArr = newpElemArr;
     }
-    pArr->delFunc((pArr->pElemArr)[idx]);
+    if ((pArr->pElemArr)[idx] != NULL)
+        pArr->delFunc((pArr->pElemArr)[idx]);
     (pArr->pElemArr)[idx] = pArr->copyFunc(pNewElem);
     pArr->ArrSize = (idx >= pArr->ArrSize) ? (idx + 1) : pArr->ArrSize;
     return SUCCESS;
@@ -56,17 +61,14 @@ PElement GetAdptArrayAt(PAdptArray pArr, int idx){
         return NULL;
     }
     PElement pElem = pArr->pElemArr[idx];
-    if (!pElem) {
-        printf("Error! no element stored at that particular index")
+    if (!pElem)
         return NULL;
-    }
     return pArr->copyFunc(pElem);
 }
 
 int GetAdptArraySize(PAdptArray pArr) {
-    if (!pArr || pArr->ArrSize < 1) {
+    if (!pArr)
         return -1;
-    }
     return pArr->ArrSize;
 }
 
@@ -77,8 +79,8 @@ void PrintDB(PAdptArray pArr) {
         return;
     }
     for (i = 0; i < pArr->ArrSize; i++) {
-        printf("[%d]: ", i);
+        if ((pArr->pElemArr)[i] == NULL)
+            continue;
         pArr->printFunc(pArr->pElemArr[i]);
-        printf("\n");
     }
 }
